@@ -31,7 +31,7 @@ def generate_category_image(out_file: str, frm: int, to: int) -> None:
         plt.imshow(first_frame)
         plt.axis('off')
 
-    plt.savefig(f'check_images/{out_file}')
+    plt.savefig(os.path.join('check_images', out_file))
 
 show_categories_info()
 generate_category_image('check_1.png', 0, 20)

@@ -1,4 +1,5 @@
 import os
+import sys
 import random
 import json
 import datetime as dt
@@ -9,6 +10,9 @@ import cv2
 import tensorflow as tf
 
 from sklearn.model_selection import train_test_split
+
+# Force TensorFlow to use the CPU
+tf.config.set_visible_devices([], 'GPU')
 
 layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
@@ -25,12 +29,13 @@ np.random.seed(SEED_CONSTANT)
 random.seed(SEED_CONSTANT)
 tf.random.set_seed(SEED_CONSTANT)
 
+MODELS_DIR = 'models'
 DATASETS_DIR = 'datasets'
 PREPROCESSED_IMAGES_DIR = 'preprocessed_images'
 IMAGE_HEIGHT, IMAGE_WIDTH = 64, 64
 FRAMES_COUNT = 20
 BATCH_SIZE = 48
-EPOCHS_COUNT = 2
+EPOCHS_COUNT = 20
 
 def load_prepared_videos_list_and_mapper():
     with open(os.path.join(DATASETS_DIR, f'{PREPROCESSED_IMAGES_DIR}_metadata.json'), 'r') as metadata_file:
@@ -49,6 +54,18 @@ def extract_frames(videofile_path):
         frame = frame / 255 # Normalize the frame
         frames_list.append(frame)
     return frames_list
+
+class Logger(object):
+    def __init__(self, filename):
+        self.terminal = sys.stdout
+        self.log = open(filename, 'a', encoding='utf-8')
+
+    def write(self, message):
+        self.terminal.write(message)
+        self.log.write(message)
+
+    def flush(self):
+        pass
 
 class VideoDataGenerator(tf.keras.utils.Sequence):
     def __init__(self, videos_metadata, batch_size, classes_count, shuffle=True):
@@ -130,6 +147,9 @@ def plot_metric(model_name, model_training_history, metric_name_1, metric_name_2
     plt.legend()
     
     plt.savefig(os.path.join('models', model_name, f'{plot_name}.png'))
+    plt.clf()
+    plt.cla()
+    plt.close()
 
 def main():
     # Use the data generator
@@ -171,25 +191,20 @@ def main():
         training_generator,
         validation_data=validation_generator,
         epochs=EPOCHS_COUNT,
-        # use_multiprocessing=True,
-        # workers=4,
-        # max_queue_size=10,
+        use_multiprocessing=False,
+        workers=4,
+        max_queue_size=10,
     )
     model_evaluation_history = convlstm_model.evaluate(validation_generator)
 
     # Get the loss and accuracy from model_evaluation_history.
     model_evaluation_loss, model_evaluation_accuracy = model_evaluation_history
 
-    # Define the string date format.
-    # Get the current Date and Time in a DateTime Object.
-    # Convert the DateTime object to string according to the style mentioned in date_time_format string.
-    date_time_format = '%Y%m%d%H%M%S'
-    current_date_time_dt = dt.datetime.now()
-    current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
+    print(f'Model evaluation loss = {round(model_evaluation_loss, 3)}')
+    print(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
 
-    model_name = f'convlstm_model_{current_date_time_string}___epochs_{EPOCHS_COUNT}___loss_{round(model_evaluation_loss, 3)}___accuracy_{round(model_evaluation_accuracy, 3)}'
     # Define a useful name for our model to make it easy for us while navigating through multiple saved models.
-    model_file_name = os.path.join('models', model_name, 'model.h5')
+    model_file_name = os.path.join(MODELS_DIR, model_name, 'model.keras')
 
     # Save your Model.
     convlstm_model.save(model_file_name)
@@ -199,6 +214,19 @@ def main():
     # Visualize the training and validation accuracy metrices.
     plot_metric(model_name, convlstm_model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
 
-if __name__ == '__main__':
+    # TODO: possibly add ziping the model's folder
+
+original_stdout = sys.stdout
+original_stderr = sys.stderr
+try:
+    date_time_format = '%Y%m%d%H%M%S'
+    current_date_time_dt = dt.datetime.now()
+    current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
+    model_name = f'convlstm_model_{current_date_time_string}_{EPOCHS_COUNT}'
+    os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
+    sys.stdout = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt'))
+    sys.stderr = sys.stdout
     main()
-    
+finally:
+    sys.stdout = original_stdout
+    sys.stderr = original_stderr

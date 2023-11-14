@@ -25,13 +25,15 @@ np.random.seed(SEED_CONSTANT)
 random.seed(SEED_CONSTANT)
 tf.random.set_seed(SEED_CONSTANT)
 
+DATASETS_DIR = 'datasets'
+DATASET_NAME = 'UCF-101'
 IMAGE_HEIGHT, IMAGE_WIDTH = 32, 32
-FRAMES_COUNT = 8
+FRAMES_COUNT = 20
 BATCH_SIZE = 48
 EPOCHS_COUNT = 2
 
 def load_prepared_videos_list_and_mapper():
-    with open('metadata.json', 'r') as metadata_file:
+    with open(os.path.join(DATASETS_DIR, f'{DATASET_NAME}_metadata.json'), 'r') as metadata_file:
         metadata = json.load(metadata_file)
     videos_list = list(metadata['videos'].items())
     random.shuffle(videos_list)
