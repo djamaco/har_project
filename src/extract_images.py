@@ -4,7 +4,7 @@ import concurrent.futures
 from constants.config import *
 from data.data_extractor import process_class_videos
 
-classes = os.listdir(os.path.join(DATASETS_DIR, DATASET_NAME))[:2]
+classes = os.listdir(os.path.join(DATASETS_DIR, DATASET_NAME))
 metadata = {'classes': {}, 'videos': {}}
 
 with concurrent.futures.ThreadPoolExecutor() as executor:

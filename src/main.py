@@ -29,17 +29,15 @@ plot_model = tf.keras.utils.plot_model
 mixed_precision = tf.keras.mixed_precision
 
 def main():
+    # TODO: add a usefull printing here so all the config and init params will be logged
     print('Starting the model creation')
     print(f'Random seed=')
-    # Use the data generator
+
     videos_list, category_mapper = load_prepared_videos_list_and_mapper()
     classes_count = len(category_mapper)
-
     train_videos, test_videos = train_test_split(videos_list, test_size=0.3, random_state=SEED_CONSTANT, shuffle=True)
-
     print(f'Split is done for the videos: {len(train_videos)} videos for training and {len(test_videos)} videos for testing')
 
-    # Create the generators
     training_generator = VideoDataGenerator(**{
         'videos_metadata': train_videos,
         'batch_size': BATCH_SIZE,
@@ -53,10 +51,10 @@ def main():
         'shuffle': False
     })
 
-    # Construct the required convlstm model.
     convlstm_model = create_convlstm_model(classes_count)
     print("Model Created Successfully!")
 
+    # TODO: enable it and save to the model directory
     # Plot the structure of the contructed model.
     # plot_model(convlstm_model, to_file = 'convlstm_model_structure_plot.png', show_shapes = True, show_layer_names = True)
 
@@ -75,22 +73,14 @@ def main():
         max_queue_size=10,
     )
     model_evaluation_history = convlstm_model.evaluate(validation_generator)
-
-    # Get the loss and accuracy from model_evaluation_history.
     model_evaluation_loss, model_evaluation_accuracy = model_evaluation_history
-
     print(f'Model evaluation loss = {round(model_evaluation_loss, 3)}')
     print(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
 
-    # Define a useful name for our model to make it easy for us while navigating through multiple saved models.
     model_file_name = os.path.join(MODELS_DIR, model_name, 'model.keras')
-
-    # Save your Model.
     convlstm_model.save(model_file_name)
 
-    # Visualize the training and validation loss metrices.
     create_plot_metric_and_save_to_model(model_name, convlstm_model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
-    # Visualize the training and validation accuracy metrices.
     create_plot_metric_and_save_to_model(model_name, convlstm_model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
 
     # TODO: possibly add ziping the model's folder
