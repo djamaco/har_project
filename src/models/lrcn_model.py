@@ -23,7 +23,6 @@ def create_lrcn_model(classes_count):
     
     model.add(layers.TimeDistributed(layers.Conv2D(64, (3, 3), padding='same',activation = 'relu')))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
-    #model.add(TimeDistributed(Dropout(0.25)))
                                       
     model.add(layers.TimeDistributed(layers.Flatten()))
                                       
