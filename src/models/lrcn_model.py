@@ -5,6 +5,15 @@ layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
 
 def create_lrcn_model(classes_count):
+    """
+    Creates a Long-term Recurrent Convolutional Network (LRCN) model for human activity recognition.
+
+    Args:
+        classes_count (int): The number of classes to predict.
+
+    Returns:
+        tf.keras.models.Sequential: The LRCN model.
+    """
     model = Sequential()
     
     model.add(layers.TimeDistributed(layers.Conv2D(16, (3, 3), padding='same',activation = 'relu'),

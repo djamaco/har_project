@@ -5,6 +5,15 @@ layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
 
 def create_convlstm_model(classes_count):
+    """
+    Creates a ConvLSTM model for human activity recognition.
+
+    Args:
+    classes_count (int): Number of classes for classification.
+
+    Returns:
+    model (keras.Sequential): A ConvLSTM model for human activity recognition.
+    """
     model = Sequential()
     model.add(layers.ConvLSTM2D(filters = 4, kernel_size = (3, 3), activation = 'tanh',data_format = "channels_last",
                          recurrent_dropout=0.2, return_sequences=True, input_shape = (FRAMES_COUNT,
