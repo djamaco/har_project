@@ -1,7 +1,7 @@
 import os
 import cv2
 
-from constants.config import *
+from config import *
 
 
 def extract_and_save_frames(videofile_path, video_name, class_name, class_index, video_index, total_video_count, classes):
@@ -23,7 +23,7 @@ def extract_and_save_frames(videofile_path, video_name, class_name, class_index,
 def process_class_videos(class_name, class_index, videofiles_list, classes, metadata):
     total_video_count = len(videofiles_list)
     metadata['classes'][class_index]['total_videos_count'] = total_video_count
-    for video_index, video_name in enumerate(videofiles_list):
+    for video_index, video_name in enumerate(videofiles_list[:FRAMES_COUNT]): #  TODO: [:FRAMES_COUNT] is added here just to be consistent with all the rest code. before each run of a main.py we need to make sure that images were pre-processed with the same size.
         videofile_path = os.path.join(DATASETS_DIR, DATASET_NAME, class_name, video_name)
         extract_and_save_frames(videofile_path, video_name, class_name, class_index, video_index, total_video_count, classes)
         metadata['videos'][os.path.join(DATASETS_DIR, PREPROCESSED_IMAGES_DIR, class_name, video_name)] = class_index

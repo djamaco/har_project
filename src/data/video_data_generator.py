@@ -1,7 +1,8 @@
 import numpy as np
 import tensorflow as tf
+import concurrent.futures
 
-from constants.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT
+from config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT
 from data.data_loader import extract_frames
 
 Sequence = tf.keras.utils.Sequence
@@ -33,15 +34,21 @@ class VideoDataGenerator(tf.keras.utils.Sequence):
         if self.shuffle:
             np.random.shuffle(self.indexes)
 
+    def __process_video__(self, videofile_path, category_label, X, y, i):
+        frames = extract_frames(videofile_path)
+        if frames is not None:
+            X[i,] = np.stack(frames, axis=0)
+
+        y[i] = category_label
+
     def __data_generation(self, batch_videos_metadata):
         X = np.empty((self.batch_size, FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.float32)
         y = np.empty((self.batch_size), dtype=int)
 
-        for i, (videofile_path, category_label) in enumerate(batch_videos_metadata):
-            frames = extract_frames(videofile_path)
-            if frames is not None:
-                X[i,] = np.stack(frames, axis=0)
-
-            y[i] = category_label
+        with concurrent.futures.ThreadPoolExecutor() as executor:
+            futures = []
+            for i, (videofile_path, category_label) in enumerate(batch_videos_metadata):
+                futures.append(executor.submit(self.__process_video__, videofile_path, category_label, X, y, i))
+            concurrent.futures.wait(futures)
 
         return X, to_categorical(y, num_classes=self.classes_count)

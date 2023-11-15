@@ -1,5 +1,5 @@
 import tensorflow as tf
-from constants.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
+from config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
 
 layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
