@@ -16,6 +16,8 @@ def get_model(model_name: Union[ModelName, str], **kwargs) -> Sequential:
     if model_create_function is None:
         raise ValueError(f'No model found: {model_name}')
     model = model_create_function(**kwargs)
+    # Display the models summary.
+    model.summary()
     return model
     
 

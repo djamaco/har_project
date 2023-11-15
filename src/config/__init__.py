@@ -2,7 +2,7 @@ import os
 from .constants import ModelName
 
 # One seed to rule them all
-SEED_CONSTANT = 28 # TODO: add a comment WHY
+SEED_CONSTANT = 28 # This is how old I was when I started this project. Also it is good to have a constant seed for reproducibility.
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 MODELS_DIR = os.path.join(PROJECT_DIR, 'processed_models')
