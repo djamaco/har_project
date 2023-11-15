@@ -2,13 +2,15 @@ from typing import Union
 
 from config.constants import ModelName
 from .convlstm_model import create_convlstm_model
+from .lrcn_model import create_lrcn_model
 
 import tensorflow as tf
 
 Sequential = tf.keras.models.Sequential
 
 models_create_functions = {
-    ModelName.CONVLSTM: create_convlstm_model
+    ModelName.CONVLSTM: create_convlstm_model,
+    ModelName.LRCN: create_lrcn_model,
 }
 
 def get_model(model_name: Union[ModelName, str], **kwargs) -> Sequential:
