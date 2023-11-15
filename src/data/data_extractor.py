@@ -1,7 +1,7 @@
 import os
 import cv2
 
-from config import *
+from src.config import *
 
 
 def extract_and_save_frames(videofile_path, video_name, class_name, class_index, video_index, total_video_count, classes):

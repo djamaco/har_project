@@ -5,8 +5,8 @@ from typing import Any, Tuple
 import cv2
 import tensorflow as tf
 
-from config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
-from data.data_loader import load_prepared_videos_list_and_mapper
+from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
+from src.data.data_loader import load_prepared_videos_list_and_mapper
 
 Sequential = tf.keras.models.Sequential
 
@@ -62,7 +62,7 @@ def predict_on_video(model: Sequential, video_file_path: str, output_file_path: 
         if len(frames_queue) == FRAMES_COUNT:
             predicted_labels_probabilities = model.predict(np.expand_dims(frames_queue, axis = 0))[0]
             predicted_label = np.argmax(predicted_labels_probabilities)
-            predicted_class_name = classes[predicted_label]['name']
+            predicted_class_name = classes[str(predicted_label)]['name']
  
         # Add the predicted class name as text to the current frame
         cv2.putText(frame, predicted_class_name, (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 3)
@@ -104,7 +104,7 @@ def predict_single_action(model: Sequential, video_file_path: str) -> Tuple[str,
     predicted_label = np.argmax(predicted_labels_probabilities)
 
     _, classes = load_prepared_videos_list_and_mapper()
-    predicted_class_name = classes[predicted_label]['name']
+    predicted_class_name = classes[str(predicted_label)]['name']
     
     video_reader.release()
     return predicted_class_name, predicted_labels_probabilities[predicted_label]

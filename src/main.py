@@ -36,7 +36,7 @@ args, _ = get_args()
 
 dl_model_name = args.model or DEFAULT_MODEL_NAME
 
-def main():
+def main(model_name):
     """
     This function is the main entry point of the program. It creates a model for human activity recognition (HAR)
     using the provided configuration and saves the model to disk. It also generates plots of the model's training
@@ -122,12 +122,17 @@ def main():
     print(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
 
     # Save the model to disk
-    model_file_name = os.path.join(MODELS_DIR, model_name, 'model.keras')
+    model_file_name = os.path.join(MODELS_DIR, model_name, 'model.{MODEL_FORMAT}')
     model.save(model_file_name)
 
     # Generate plots of the model's training history and save them to disk
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
+
+    # Rename the model's directory to include the model's accuracy
+    accuracy_based_model_name = f'{model_name}_{str(round(model_evaluation_accuracy, 3)).split(".")[1]}'
+    os.rename(os.path.join(MODELS_DIR, model_name), os.path.join(MODELS_DIR, accuracy_based_model_name))
+    model_name = accuracy_based_model_name
 
     # If the user specified the --zip flag, create a zip archive of the saved model
     if args.zip and args.zip.lower() == 'true':
@@ -145,7 +150,7 @@ try:
     os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
     sys.stdout = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt'))
     sys.stderr = sys.stdout
-    main()
+    main(model_name)
 finally:
     sys.stdout = original_stdout
     sys.stderr = original_stderr

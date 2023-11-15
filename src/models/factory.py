@@ -1,6 +1,6 @@
 from typing import Union
 
-from config.constants import ModelName
+from src.config.constants import ModelName
 from .convlstm_model import create_convlstm_model
 from .lrcn_model import create_lrcn_model
 

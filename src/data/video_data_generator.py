@@ -2,8 +2,8 @@ import numpy as np
 import tensorflow as tf
 import concurrent.futures
 
-from config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT
-from data.data_loader import extract_frames
+from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT
+from .data_loader import extract_frames
 
 Sequence = tf.keras.utils.Sequence
 to_categorical = tf.keras.utils.to_categorical

@@ -1,6 +1,6 @@
 import os
 import matplotlib.pyplot as plt
-from config import MODELS_DIR
+from src.config import MODELS_DIR
 
 def create_plot_metric_and_save_to_model(model_name, model_training_history, metric_name_1, metric_name_2, plot_name):
     metric_value_1 = model_training_history.history[metric_name_1]

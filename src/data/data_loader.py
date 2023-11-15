@@ -2,7 +2,7 @@ import os
 import random
 import json
 import cv2
-from config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, SEED_CONSTANT, IMAGE_HEIGHT, IMAGE_WIDTH
+from src.config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, SEED_CONSTANT, IMAGE_HEIGHT, IMAGE_WIDTH
 
 def load_prepared_videos_list_and_mapper():
     with open(os.path.join(DATASETS_DIR, f'{PREPROCESSED_IMAGES_NAME}_metadata.json'), 'r') as metadata_file:
