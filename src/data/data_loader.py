@@ -2,14 +2,22 @@ import os
 import random
 import json
 import cv2
-from src.config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, IMAGE_HEIGHT, IMAGE_WIDTH, FRAMES_COUNT
+from src.config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, IMAGE_HEIGHT, IMAGE_WIDTH, FRAMES_COUNT, TAKE_NTH_FIRST_CLASSES, TAKE_SPECIFIC_CLASSES
 
 def load_prepared_videos_list_and_mapper():
     with open(os.path.join(DATASETS_DIR, f'{PREPROCESSED_IMAGES_NAME}_metadata.json'), 'r') as metadata_file:
         metadata = json.load(metadata_file)
-    videos_list = list(metadata['videos'].items())
+    if TAKE_NTH_FIRST_CLASSES is not None:
+        category_mapper = {k: v for k, v in metadata['classes'].items() if k in list(metadata['classes'].keys())[:TAKE_NTH_FIRST_CLASSES]}
+    else:
+        category_mapper = metadata['classes']
+    if TAKE_SPECIFIC_CLASSES is not None:
+        category_mapper = {k: v for k, v in category_mapper.items() if k in TAKE_SPECIFIC_CLASSES}
+    
+    # filter out the videos that are not in the category mapper
+    filtered_videos = {video: label for video, label in metadata['videos'].items() if str(label) in list(category_mapper.keys())}
+    videos_list = list(filtered_videos.items())
     random.shuffle(videos_list)
-    category_mapper = metadata['classes']
     return videos_list, category_mapper
 
 def extract_preprocessed_frames(videofile_path):

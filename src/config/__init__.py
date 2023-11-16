@@ -5,7 +5,7 @@ from .constants import ModelName
 SEED_CONSTANT = 28 # This is how old I was when I started this project. Also it is good to have a constant seed for reproducibility.
 
 PROJECT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-MODELS_DIR = os.path.join(PROJECT_DIR, 'processed_models')
+MODELS_DIR = os.path.join(PROJECT_DIR, 'trained_models')
 DATASETS_DIR =  os.path.join(PROJECT_DIR, 'datasets')
 DATASET_NAME = 'UCF-101'
 PREPROCESSED_IMAGES_NAME = 'preprocessed_images'
@@ -13,10 +13,17 @@ PREPROCESSED_IMAGES_DIR = os.path.join(DATASETS_DIR, PREPROCESSED_IMAGES_NAME)
 
 DEFAULT_MODEL_NAME = ModelName.LRCN.value # TODO: doesnt work with enum itself (fix it)
 
+# Main constants
 IMAGE_HEIGHT, IMAGE_WIDTH = 64, 64
 FRAMES_COUNT = 20
 BATCH_SIZE = 128
 EPOCHS_COUNT = 50
+AUGMENTATION_ENABLED = False
+MODEL_WORKERS_COUNT = 4
+MODEL_MAX_QUEUE_SIZE = 16
+TAKE_NTH_FIRST_CLASSES = 10
+TAKE_SPECIFIC_CLASSES = None
+GA_STEPS = 4
 
 # The section for testing scripts
 DEFAULT_TRAINED_MODEL_NAME = ''

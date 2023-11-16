@@ -61,10 +61,15 @@ def main(model_name):
     print(f'Iamge height={IMAGE_HEIGHT}')
     print(f'Iamge width={IMAGE_WIDTH}')
     print(f'Frames count={FRAMES_COUNT}')
-    print('='.join(['' for _ in range(100)]))
+    print(f'Augmenation used={AUGMENTATION_ENABLED}')
+    print(f'Model workers count={MODEL_WORKERS_COUNT}')
+    print(f'Model max queue size={MODEL_MAX_QUEUE_SIZE}')
 
     # Load the list of prepared videos and the category mapper
     videos_list, category_mapper = load_prepared_videos_list_and_mapper()
+    print(f'Total videos count: {len(videos_list)}')
+    print(f'Classes for ptraining: {[i["name"] for i in category_mapper.values()]}')
+    print('='.join(['' for _ in range(100)]))
 
     # Get the number of classes
     classes_count = len(category_mapper)
@@ -79,12 +84,14 @@ def main(model_name):
         'batch_size': BATCH_SIZE,
         'classes_count': classes_count,
         'shuffle': True,
+        'augmentation_used': AUGMENTATION_ENABLED,
     })
     validation_generator = VideoDataGenerator(**{
         'videos_metadata': test_videos,
         'batch_size': BATCH_SIZE,
         'classes_count': classes_count,
         'shuffle': False,
+        'augmentation_used': AUGMENTATION_ENABLED,
     })
 
     # Create the model
@@ -114,8 +121,8 @@ def main(model_name):
         validation_data=validation_generator,
         epochs=EPOCHS_COUNT,
         use_multiprocessing=False,
-        workers=4,
-        max_queue_size=10,
+        workers=MODEL_WORKERS_COUNT,
+        max_queue_size=MODEL_MAX_QUEUE_SIZE,
         callbacks=[early_stopping, lr_reduction],
     )
 
