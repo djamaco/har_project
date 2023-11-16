@@ -46,18 +46,22 @@ def create_lrcn_model_bleed(classes_count):
 def create_lrcn_model(classes_count):
     model = Sequential()
     FCN_MAGIC_NUMBER = 16
-
+    
     # TimeDistributed CNN layers
-    model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER, (3, 3),  padding='same', activation='relu'),
+    model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER, (3, 3),  padding='same'),
                                      input_shape=(FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, 3)))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
-    model.add(layers.TimeDistributed(layers.Dropout(0.25)))
 
     model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER * 2, (3, 3), padding='same', activation='relu')))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
-    model.add(layers.TimeDistributed(layers.Dropout(0.25)))
 
     model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER * 4, (3, 3), padding='same', activation='relu')))
+    model.add(layers.BatchNormalization())
+    model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
 
     model.add(layers.TimeDistributed(layers.Flatten()))
