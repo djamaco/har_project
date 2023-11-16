@@ -50,7 +50,7 @@ def main(model_name):
         None
     """
     print('Starting the model creation')
-    print(f'Using model: {dl_model_name} with provided configuration')
+    print(f'Using model {dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name} with provided configuration')
     print('='.join(['' for _ in range(100)]))
     print(f'Random seed={SEED_CONSTANT}')
     print(f'Epochs count={EPOCHS_COUNT}')
@@ -76,13 +76,13 @@ def main(model_name):
         'videos_metadata': train_videos,
         'batch_size': BATCH_SIZE,
         'classes_count': classes_count,
-        'shuffle': True
+        'shuffle': True,
     })
     validation_generator = VideoDataGenerator(**{
         'videos_metadata': test_videos,
         'batch_size': BATCH_SIZE,
         'classes_count': classes_count,
-        'shuffle': False
+        'shuffle': False,
     })
 
     # Create the model
@@ -122,8 +122,8 @@ def main(model_name):
     print(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
 
     # Save the model to disk
-    model_file_name = os.path.join(MODELS_DIR, model_name, 'model.{MODEL_FORMAT}')
-    model.save(model_file_name)
+    model.save(os.path.join(MODELS_DIR, model_name, 'model.h5'))
+    model.save(os.path.join(MODELS_DIR, model_name, 'model.keras'))
 
     # Generate plots of the model's training history and save them to disk
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
@@ -146,7 +146,7 @@ try:
     date_time_format = '%Y%m%d%H%M%S'
     current_date_time_dt = dt.datetime.now()
     current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
-    model_name = f'{dl_model_name.value if isinstance(dl_model_name, ModelName) else dl_model_name}_model_{current_date_time_string}_{EPOCHS_COUNT}'
+    model_name = f'{dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name}_model_{current_date_time_string}_{EPOCHS_COUNT}'
     os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
     sys.stdout = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt'))
     sys.stderr = sys.stdout
