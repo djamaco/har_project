@@ -4,8 +4,9 @@ from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
 layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
 
-def create_convlstm_model(classes_count):
+def create_convlstm_model_bleed(classes_count):
     """
+    Source: https://bleedaiacademy.com/human-activity-recognition-using-tensorflow-cnn-lstm/
     Creates a ConvLSTM model for human activity recognition.
 
     Args:
