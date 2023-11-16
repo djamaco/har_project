@@ -4,6 +4,7 @@ import random
 import datetime as dt
 import numpy as np
 import shutil
+import time
 
 import tensorflow as tf
 
@@ -113,9 +114,12 @@ def main(model_name):
 
     # Set up early stopping and learning rate reduction callbacks
     early_stopping = EarlyStopping(monitor='val_loss', patience=10)
+    # TODO: fix incompleted output log when this callback is triggered
     lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=5, verbose=1, factor=0.5, min_lr=0.00001)
 
+    
     # Train the model
+    start_time = time.time()
     model_training_history = model.fit(
         training_generator,
         validation_data=validation_generator,
@@ -125,6 +129,7 @@ def main(model_name):
         max_queue_size=MODEL_MAX_QUEUE_SIZE,
         callbacks=[early_stopping, lr_reduction],
     )
+    end_time = time.time()
 
     # Evaluate the model on the validation set
     model_evaluation_history = model.evaluate(validation_generator)
@@ -139,6 +144,9 @@ def main(model_name):
     # Generate plots of the model's training history and save them to disk
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
+
+    # Print the time taken for training the model
+    print(f'Time taken for training the model: {round((end_time - start_time) * 1000, 3)} ms')
 
     # Rename the model's directory to include the model's accuracy
     accuracy_based_model_name = f'{model_name}_{str(round(model_evaluation_accuracy, 3)).split(".")[1]}'
