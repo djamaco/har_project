@@ -39,7 +39,7 @@ args, _ = get_args()
 
 dl_model_name = args.model or DEFAULT_MODEL_NAME
 
-def main(model_name):
+def main():
     """
     This function is the main entry point of the program. It creates a model for human activity recognition (HAR)
     using the provided configuration and saves the model to disk. It also generates plots of the model's training
@@ -52,32 +52,39 @@ def main(model_name):
     Returns:
         None
     """
-    print('Starting the model creation')
-    print(f'Using model {dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name} with provided configuration')
-    print('='.join(['' for _ in range(100)]))
-    print(f'Random seed={SEED_CONSTANT}')
-    print(f'Epochs count={EPOCHS_COUNT}')
-    print(f'Batch size={BATCH_SIZE}')
-    print(f'Dataset name={DATASET_NAME}')
-    print(f'Iamge height={IMAGE_HEIGHT}')
-    print(f'Iamge width={IMAGE_WIDTH}')
-    print(f'Frames count={FRAMES_COUNT}')
-    print(f'Augmenation used={AUGMENTATION_ENABLED}')
-    print(f'Model workers count={MODEL_WORKERS_COUNT}')
-    print(f'Model max queue size={MODEL_MAX_QUEUE_SIZE}')
+    date_time_format = '%Y%m%d%H%M%S'
+    current_date_time_dt = dt.datetime.now()
+    current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
+    model_name = f'{dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name}_model_{current_date_time_string}_{EPOCHS_COUNT}'
+    os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
+    logger = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt')).get_logger()
+
+    logger.info('Starting the model creation')
+    logger.info(f'Using model {dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name} with provided configuration')
+    logger.info('='.join(['' for _ in range(100)]))
+    logger.info(f'Random seed={SEED_CONSTANT}')
+    logger.info(f'Epochs count={EPOCHS_COUNT}')
+    logger.info(f'Batch size={BATCH_SIZE}')
+    logger.info(f'Dataset name={DATASET_NAME}')
+    logger.info(f'Iamge height={IMAGE_HEIGHT}')
+    logger.info(f'Iamge width={IMAGE_WIDTH}')
+    logger.info(f'Frames count={FRAMES_COUNT}')
+    logger.info(f'Augmenation used={AUGMENTATION_ENABLED}')
+    logger.info(f'Model workers count={MODEL_WORKERS_COUNT}')
+    logger.info(f'Model max queue size={MODEL_MAX_QUEUE_SIZE}')
 
     # Load the list of prepared videos and the category mapper
     videos_list, category_mapper = load_prepared_videos_list_and_mapper()
-    print(f'Total videos count: {len(videos_list)}')
-    print(f'Classes for ptraining: {[i["name"] for i in category_mapper.values()]}')
-    print('='.join(['' for _ in range(100)]))
+    logger.info(f'Total videos count: {len(videos_list)}')
+    logger.info(f'Classes for ptraining: {[i["name"] for i in category_mapper.values()]}')
+    logger.info('='.join(['' for _ in range(100)]))
 
     # Get the number of classes
     classes_count = len(category_mapper)
 
     # Split the videos into training and testing sets
     train_videos, test_videos = train_test_split(videos_list, test_size=0.3, random_state=SEED_CONSTANT, shuffle=True)
-    print(f'Split is done for the videos: {len(train_videos)} videos for training and {len(test_videos)} videos for testing')
+    logger.info(f'Split is done for the videos: {len(train_videos)} videos for training and {len(test_videos)} videos for testing')
 
     # Create data generators for the training and validation sets
     training_generator = VideoDataGenerator(**{
@@ -97,7 +104,7 @@ def main(model_name):
 
     # Create the model
     model = factory.get_model(dl_model_name, **{'classes_count': classes_count})
-    print("Model Created Successfully!")
+    logger.info("Model Created Successfully!")
 
     # Plot the model's structure and save it to disk
     plot_model(model, to_file = os.path.join(MODELS_DIR, model_name, 'model_structure_plot.png'), show_shapes = True, show_layer_names = True)
@@ -114,7 +121,6 @@ def main(model_name):
 
     # Set up early stopping and learning rate reduction callbacks
     early_stopping = EarlyStopping(monitor='val_loss', patience=10)
-    # TODO: fix incompleted output log when this callback is triggered
     lr_reduction = ReduceLROnPlateau(monitor='val_loss', patience=5, verbose=1, factor=0.5, min_lr=0.00001)
 
     
@@ -134,8 +140,8 @@ def main(model_name):
     # Evaluate the model on the validation set
     model_evaluation_history = model.evaluate(validation_generator)
     model_evaluation_loss, model_evaluation_accuracy = model_evaluation_history
-    print(f'Model evaluation loss = {round(model_evaluation_loss, 3)}')
-    print(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
+    logger.info(f'Model evaluation loss = {round(model_evaluation_loss, 3)}')
+    logger.info(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
 
     # Save the model to disk
     model.save(os.path.join(MODELS_DIR, model_name, 'model.h5'))
@@ -146,7 +152,7 @@ def main(model_name):
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
 
     # Print the time taken for training the model
-    print(f'Time taken for training the model: {round((end_time - start_time) * 1000, 3)} ms')
+    logger.info(f'Time taken for training the model: {round((end_time - start_time) * 1000, 3)} ms')
 
     # Rename the model's directory to include the model's accuracy
     accuracy_based_model_name = f'{model_name}_{str(round(model_evaluation_accuracy, 3)).split(".")[1]}'
@@ -155,21 +161,9 @@ def main(model_name):
 
     # If the user specified the --zip flag, create a zip archive of the saved model
     if args.zip and args.zip.lower() == 'true':
-        print('Zipping the model')
+        logger.info('Zipping the model')
         shutil.make_archive(os.path.join(MODELS_DIR, model_name), 'zip', os.path.join(MODELS_DIR, model_name))
-        print('Zipping is done')
+        logger.info('Zipping is done')
 
-original_stdout = sys.stdout
-original_stderr = sys.stderr
-try:
-    date_time_format = '%Y%m%d%H%M%S'
-    current_date_time_dt = dt.datetime.now()
-    current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
-    model_name = f'{dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name}_model_{current_date_time_string}_{EPOCHS_COUNT}'
-    os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
-    sys.stdout = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt'))
-    sys.stderr = sys.stdout
-    main(model_name)
-finally:
-    sys.stdout = original_stdout
-    sys.stderr = original_stderr
+
+main()
