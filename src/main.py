@@ -31,6 +31,8 @@ plot_model = tf.keras.utils.plot_model
 mixed_precision = tf.keras.mixed_precision
 EarlyStopping = tf.keras.callbacks.EarlyStopping
 ReduceLROnPlateau = tf.keras.callbacks.ReduceLROnPlateau
+AdamOptimizer = tf.keras.optimizers.legacy.Adam
+CategoricalCrossentropy = tf.keras.losses.CategoricalCrossentropy
 
 args, _ = get_args()
 
@@ -92,10 +94,12 @@ def main(model_name):
     # Plot the model's structure and save it to disk
     plot_model(model, to_file = os.path.join(MODELS_DIR, model_name, 'model_structure_plot.png'), show_shapes = True, show_layer_names = True)
 
+    optimizer = AdamOptimizer()
+    loss = CategoricalCrossentropy()
     # Compile the model
     model.compile(
-        loss = 'categorical_crossentropy',
-        optimizer = 'Adam',
+        loss = loss,
+        optimizer = optimizer,
         metrics = ["accuracy"],
         experimental_run_tf_function=False,
     )
