@@ -9,7 +9,7 @@ import tensorflow as tf
 Sequential = tf.keras.models.Sequential
 
 models_create_functions = {
-    ModelName.CONVLSTM: create_convlstm_model_bleed,
+    ModelName.CONVLSTM_BLEED: create_convlstm_model_bleed,
     ModelName.LRCN: create_lrcn_model,
     ModelName.LRCN_BLEED: create_lrcn_model_bleed,
 }

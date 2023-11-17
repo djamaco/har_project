@@ -12,13 +12,25 @@ def load_prepared_videos_list_and_mapper():
     else:
         category_mapper = metadata['classes']
     if TAKE_SPECIFIC_CLASSES is not None:
-        category_mapper = {k: v for k, v in category_mapper.items() if k in TAKE_SPECIFIC_CLASSES}
+        category_mapper = {k: v for k, v in category_mapper.items() if v['name'] in TAKE_SPECIFIC_CLASSES}
     
     # filter out the videos that are not in the category mapper
     filtered_videos = {video: label for video, label in metadata['videos'].items() if str(label) in list(category_mapper.keys())}
     videos_list = list(filtered_videos.items())
     random.shuffle(videos_list)
-    return videos_list, category_mapper
+
+    if (TAKE_NTH_FIRST_CLASSES is None) and (TAKE_SPECIFIC_CLASSES is None): return videos_list, category_mapper
+
+    new_cateogory_mapper = {}
+    #Normalize classes labels inside category_mapper and videos_list to be in range [0, len(category_mapper))
+    for i, (key, value) in enumerate(category_mapper.items()):
+        value['old_label'] = int(key)
+        new_cateogory_mapper[i] = value
+        for j, (video_name, label) in enumerate(videos_list):
+            if label == int(key):
+                videos_list[j] = (video_name, i)
+    
+    return videos_list, new_cateogory_mapper
 
 def extract_preprocessed_frames(videofile_path):
     frames_list = []

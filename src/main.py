@@ -18,8 +18,9 @@ from utils.logger import Logger
 from utils.plot_utils import create_plot_metric_and_save_to_model
 from utils.arguments import get_args
 
-# Force TensorFlow to use the CPU
-tf.config.set_visible_devices([], 'GPU')
+if GPU_USED is False:
+    # Force TensorFlow to use the CPU
+    tf.config.set_visible_devices([], 'GPU')
 
 np.random.seed(SEED_CONSTANT)
 random.seed(SEED_CONSTANT)
@@ -34,6 +35,9 @@ EarlyStopping = tf.keras.callbacks.EarlyStopping
 ReduceLROnPlateau = tf.keras.callbacks.ReduceLROnPlateau
 AdamOptimizer = tf.keras.optimizers.legacy.Adam
 CategoricalCrossentropy = tf.keras.losses.CategoricalCrossentropy
+F1Score = tf.keras.metrics.F1Score
+Accuracy = tf.keras.metrics.Accuracy
+AUC = tf.keras.metrics.AUC
 
 args, _ = get_args()
 
@@ -52,10 +56,15 @@ def main():
     Returns:
         None
     """
+    # Load the list of prepared videos and the category mapper
+    videos_list, category_mapper = load_prepared_videos_list_and_mapper()
+     # Get the number of classes
+    classes_count = len(category_mapper)
+
     date_time_format = '%Y%m%d%H%M%S'
     current_date_time_dt = dt.datetime.now()
     current_date_time_string = dt.datetime.strftime(current_date_time_dt, date_time_format)
-    model_name = f'{dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name}_model_{current_date_time_string}_{EPOCHS_COUNT}'
+    model_name = f'{dl_model_name.value if type(dl_model_name) == ModelName else dl_model_name}_model_{current_date_time_string}_{classes_count}'
     os.makedirs(os.path.join(MODELS_DIR, model_name), exist_ok=True)
     logger = Logger(os.path.join(MODELS_DIR, model_name, 'log.txt')).get_logger()
 
@@ -73,18 +82,22 @@ def main():
     logger.info(f'Model workers count={MODEL_WORKERS_COUNT}')
     logger.info(f'Model max queue size={MODEL_MAX_QUEUE_SIZE}')
 
-    # Load the list of prepared videos and the category mapper
-    videos_list, category_mapper = load_prepared_videos_list_and_mapper()
     logger.info(f'Total videos count: {len(videos_list)}')
-    logger.info(f'Classes for ptraining: {[i["name"] for i in category_mapper.values()]}')
+    logger.info(f'Classes for training [{classes_count}]: {[i["name"] for i in category_mapper.values()]}')
     logger.info('='.join(['' for _ in range(100)]))
 
-    # Get the number of classes
-    classes_count = len(category_mapper)
+   
 
     # Split the videos into training and testing sets
     train_videos, test_videos = train_test_split(videos_list, test_size=0.3, random_state=SEED_CONSTANT, shuffle=True)
     logger.info(f'Split is done for the videos: {len(train_videos)} videos for training and {len(test_videos)} videos for testing')
+    logger.info('Check if some of the classes has to little videos for training')
+    for _, class_item in category_mapper.items():
+        class_item['train_size'] = 0
+    for _, label in train_videos:
+        category_mapper[str(label)]['train_size'] += 1
+    for _, class_item in category_mapper.items():
+        logger.info(f'{class_item["name"]} train size: {class_item["train_size"]}')
 
     # Create data generators for the training and validation sets
     training_generator = VideoDataGenerator(**{
@@ -111,12 +124,25 @@ def main():
 
     optimizer = AdamOptimizer()
     loss = CategoricalCrossentropy()
+
+    # f1_score = F1Score(threshold=0.5)
+    """
+    The AUC class is a metric for computing the Area Under the Curve (AUC) from prediction scores.
+    The AUC represents the ability of the model to distinguish between positive and negative classes.
+    An AUC of 1 indicates a perfect classifier, while an AUC of 0.5 indicates a random classifier.
+
+    The curve parameter determines the type of the curve to be computed.
+    In this case, 'ROC' stands for Receiver Operating Characteristic curve.
+    The ROC curve is a plot of the true positive rate (sensitivity) against the false positive rate (1 - specificity) for different possible cutpoints of a diagnostic test.
+    """
+    auc_curve = AUC(curve='ROC')
+    
     # Compile the model
     model.compile(
         loss = loss,
         optimizer = optimizer,
-        metrics = ["accuracy"],
-        experimental_run_tf_function=False,
+        metrics = ['accuracy', auc_curve],
+        experimental_run_tf_function=True,
     )
 
     # Set up early stopping and learning rate reduction callbacks
@@ -139,9 +165,10 @@ def main():
 
     # Evaluate the model on the validation set
     model_evaluation_history = model.evaluate(validation_generator)
-    model_evaluation_loss, model_evaluation_accuracy = model_evaluation_history
+    model_evaluation_loss, model_evaluation_accuracy, model_evaluation_auc = model_evaluation_history
     logger.info(f'Model evaluation loss = {round(model_evaluation_loss, 3)}')
     logger.info(f'Model evaluation accuracy = {round(model_evaluation_accuracy, 3)}')
+    logger.info(f'Model evaluation AUC = {round(model_evaluation_auc, 3)}')
 
     # Save the model to disk
     model.save(os.path.join(MODELS_DIR, model_name, 'model.h5'))
@@ -150,6 +177,7 @@ def main():
     # Generate plots of the model's training history and save them to disk
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'loss', 'val_loss', 'Total Loss vs Total Validation Loss')
     create_plot_metric_and_save_to_model(model_name, model_training_history, 'accuracy', 'val_accuracy', 'Total Accuracy vs Total Validation Accuracy')
+    create_plot_metric_and_save_to_model(model_name, model_training_history, 'auc', 'val_auc', 'Area Under the Curve')
 
     # Print the time taken for training the model
     logger.info(f'Time taken for training the model: {round((end_time - start_time) * 1000, 3)} ms')

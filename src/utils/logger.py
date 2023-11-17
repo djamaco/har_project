@@ -32,7 +32,7 @@ class Logger:
         console_handler.setLevel(level)
 
         # Create a formatter and set it for both handlers
-        formatter = logging.Formatter('[%(asctime)s] %(message)s')
+        formatter = logging.Formatter('%(message)s')
         file_handler.setFormatter(formatter)
         console_handler.setFormatter(formatter)
 

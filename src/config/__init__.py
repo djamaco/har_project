@@ -11,19 +11,57 @@ DATASET_NAME = 'UCF-101'
 PREPROCESSED_IMAGES_NAME = 'preprocessed_images'
 PREPROCESSED_IMAGES_DIR = os.path.join(DATASETS_DIR, PREPROCESSED_IMAGES_NAME)
 
-DEFAULT_MODEL_NAME = ModelName.LRCN.value # TODO: doesnt work with enum itself (fix it)
+DEFAULT_MODEL_NAME = ModelName.CONVLSTM_BLEED.value # TODO: doesnt work with enum itself (fix it)
 
 # Main constants
 IMAGE_HEIGHT, IMAGE_WIDTH = 64, 64
 FRAMES_COUNT = 20
 BATCH_SIZE = 128
 EPOCHS_COUNT = 50
-AUGMENTATION_ENABLED = True
+GPU_USED = False
+AUGMENTATION_ENABLED = False
 MODEL_WORKERS_COUNT = 4
 MODEL_MAX_QUEUE_SIZE = 16
-TAKE_NTH_FIRST_CLASSES = 10
-TAKE_SPECIFIC_CLASSES = None
+TAKE_NTH_FIRST_CLASSES = None # TODO: fix small number error
+TAKE_SPECIFIC_CLASSES = None # [
+#     'WritingOnBoard',
+#     'Mixing',
+#     'WalkingWithDog',
+#     'MoppingFloor',
+#     'PlayingPiano',
+#     'PlayingCello',
+#     'PlayingDhol',
+#     'PlayingGuitar',
+#     'PlayingSitar',
+#     'PlayingTabla',
+#     'PlayingViolin',
+#     'PlayingFlute',
+#     'PlayingDaf',
+#     'Knitting',
+#     'Typing',
+#     'Haircut',
+#     'BrushingTeeth',
+#     'FrisbeeCatch',
+#     'Biking',
+#     'BlowDryHair',
+#     'Drumming',
+#     'Diving',
+#     'CliffDiving',
+#     'PizzaTossing',
+#     'TaiChi',
+#     'Hammering',
+#     'ShavingBeard',
+#     'ApplyLipstick',
+#     'HorseRiding',
+#     'Basketball',
+#     'PushUps',
+#     'Drumming',
+#     'BenchPress',
+#     'HighJump',
+# ]
 GA_STEPS = 4
+
+
 
 # The section for testing scripts
 DEFAULT_TRAINED_MODEL_NAME = ''
