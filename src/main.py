@@ -75,6 +75,7 @@ def main():
     logger.info(f'Epochs count={EPOCHS_COUNT}')
     logger.info(f'Batch size={BATCH_SIZE}')
     logger.info(f'Dataset name={DATASET_NAME}')
+    logger.info(f'Black and white only={BLACK_WHITE_ONLY}')
     logger.info(f'Iamge height={IMAGE_HEIGHT}')
     logger.info(f'Iamge width={IMAGE_WIDTH}')
     logger.info(f'Frames count={FRAMES_COUNT}')
@@ -116,7 +117,7 @@ def main():
     })
 
     # Create the model
-    model = factory.get_model(dl_model_name, **{'classes_count': classes_count})
+    model = factory.get_model(dl_model_name, **{'classes_count': classes_count, 'black_while_only': BLACK_WHITE_ONLY})
     logger.info("Model Created Successfully!")
 
     # Plot the model's structure and save it to disk
