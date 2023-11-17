@@ -5,7 +5,7 @@ from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
 layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
 
-def create_lrcn_model_bleed(classes_count):
+def create_lrcn_bleed_model(classes_count):
     """
     Source: https://bleedaiacademy.com/human-activity-recognition-using-tensorflow-cnn-lstm/
     Creates a Long-term Recurrent Convolutional Network (LRCN) model for human activity recognition.
@@ -43,7 +43,17 @@ def create_lrcn_model_bleed(classes_count):
     
     return model
 
-def create_lrcn_model(classes_count):
+def create_lrcn_djamaco_model(classes_count):
+    """
+    Creates a Long-term Recurrent Convolutional Network (LRCN) model for human activity recognition.
+
+    Args:
+        classes_count (int): The number of classes for classification.
+
+    Returns:
+        model (Sequential): The LRCN model.
+
+    """
     model = Sequential()
     FCN_MAGIC_NUMBER = 16
     
