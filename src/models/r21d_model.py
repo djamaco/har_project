@@ -4,6 +4,9 @@ Sequential = tf.keras.models.Sequential
 layers = tf.keras.layers
 
 def create_r21d_djamaco_model(input_shape, classes_count):
+    """
+    NOT IMPLEMENTED.
+    """
     model = Sequential()
 
     filters_number = 64
