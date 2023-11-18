@@ -6,7 +6,7 @@ from functools import lru_cache
 
 import tensorflow as tf
 
-from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT
+from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, SEED_CONSTANT, BLACK_WHITE_ONLY
 from .data_loader import extract_preprocessed_frames
 
 Sequence = tf.keras.utils.Sequence
@@ -69,7 +69,9 @@ class VideoDataGenerator(tf.keras.utils.Sequence):
         y[i] = category_label
 
     def __data_generation(self, batch_videos_metadata):
-        X = np.empty((self.batch_size, FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.float32)
+        X = np.empty((self.batch_size, FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH), dtype=np.float32) \
+            if BLACK_WHITE_ONLY \
+            else np.empty((self.batch_size, FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, 3), dtype=np.float32)
         y = np.empty((self.batch_size), dtype=int)
 
         with concurrent.futures.ThreadPoolExecutor() as executor:

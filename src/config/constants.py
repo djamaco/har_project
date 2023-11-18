@@ -6,3 +6,4 @@ class ModelName(Enum):
     LRCN_DJAMACO = 'lrcn_djamaco'
     LRCN_BLEED = 'lrcn_bleed'
     CNN_LSTM_SYLVIA = 'cnn_lstm_sylvia'
+    R21D_DJAMACO = 'r21d_djamaco'

@@ -11,7 +11,7 @@ DATASET_NAME = 'UCF-101'
 PREPROCESSED_IMAGES_NAME = 'preprocessed_images'
 PREPROCESSED_IMAGES_DIR = os.path.join(DATASETS_DIR, PREPROCESSED_IMAGES_NAME)
 
-DEFAULT_MODEL_NAME = ModelName.LRCN_DJAMACO.value # TODO: doesnt work with enum itself (fix it)
+DEFAULT_MODEL_NAME = ModelName.R21D_DJAMACO.value # TODO: doesnt work with enum itself (fix it)
 
 # Main constants
 IMAGE_HEIGHT, IMAGE_WIDTH = 64, 64

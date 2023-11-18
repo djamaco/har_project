@@ -4,6 +4,7 @@ from src.config.constants import ModelName
 from .convlstm_model import create_convlstm_bleed_model
 from .lrcn_model import create_lrcn_djamaco_model, create_lrcn_bleed_model
 from .cnn_lstm_model import create_cnn_lstm_sylvia_model
+from .r21d_model import create_r21d_djamaco_model
 
 import tensorflow as tf
 
@@ -13,7 +14,8 @@ models_create_functions = {
     ModelName.CONVLSTM_BLEED: create_convlstm_bleed_model,
     ModelName.LRCN_DJAMACO: create_lrcn_djamaco_model,
     ModelName.LRCN_BLEED: create_lrcn_bleed_model,
-    ModelName.CNN_LSTM_SYLVIA: create_cnn_lstm_sylvia_model
+    ModelName.CNN_LSTM_SYLVIA: create_cnn_lstm_sylvia_model,
+    ModelName.R21D_DJAMACO: create_r21d_djamaco_model
 }
 
 def get_model(model_name: Union[ModelName, str], **kwargs) -> Sequential:

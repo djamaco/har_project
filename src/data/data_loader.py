@@ -2,7 +2,7 @@ import os
 import random
 import json
 import cv2
-from src.config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, IMAGE_HEIGHT, IMAGE_WIDTH, FRAMES_COUNT, TAKE_NTH_FIRST_CLASSES, TAKE_SPECIFIC_CLASSES
+from src.config import DATASETS_DIR, PREPROCESSED_IMAGES_NAME, IMAGE_HEIGHT, IMAGE_WIDTH, FRAMES_COUNT, TAKE_NTH_FIRST_CLASSES, TAKE_SPECIFIC_CLASSES, BLACK_WHITE_ONLY
 
 def load_prepared_videos_list_and_mapper():
     with open(os.path.join(DATASETS_DIR, f'{PREPROCESSED_IMAGES_NAME}_metadata.json'), 'r') as metadata_file:
@@ -37,6 +37,8 @@ def extract_preprocessed_frames(videofile_path):
     preprocessed_frames = os.listdir(videofile_path)
     for frame_name in preprocessed_frames:
         frame = cv2.imread(os.path.join(videofile_path, frame_name))
+        # Convert the frame to grayscale
+        if BLACK_WHITE_ONLY: frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         frame = cv2.resize(frame, (IMAGE_HEIGHT, IMAGE_WIDTH))
         frame = frame / 255 # Normalize the frame
         frames_list.append(frame)
