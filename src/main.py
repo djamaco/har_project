@@ -116,8 +116,10 @@ def main():
         'augmentation_used': AUGMENTATION_ENABLED,
     })
 
+
+    input_shape = (FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH, 1 if BLACK_WHITE_ONLY else 3)
     # Create the model
-    model = factory.get_model(dl_model_name, **{'classes_count': classes_count, 'black_while_only': BLACK_WHITE_ONLY})
+    model = factory.get_model(dl_model_name, **{'classes_count': classes_count, 'input_shape': input_shape})
     logger.info("Model Created Successfully!")
 
     # Plot the model's structure and save it to disk
