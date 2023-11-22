@@ -3,6 +3,7 @@ import tensorflow as tf
 layers = tf.keras.layers
 Sequential = tf.keras.models.Sequential
 Model = tf.keras.models.Model
+K = tf.keras.backend
 
 
 def create_cnn_lstm_sylvia_model(input_shape, classes_count):
@@ -40,7 +41,9 @@ def get_attention_based(inputs, time_steps):
     a = layers.Dense(time_steps, activation='softmax')(a)
     a_probs = layers.Permute((2, 1), name='attention_vec')(a)
     output_attention_mul = layers.Multiply()([inputs, a_probs])
-    return output_attention_mul
+    # Summing over the time axis to get a single representation
+    output_summed = layers.Lambda(lambda x: K.sum(x, axis=1))(output_attention_mul)
+    return output_summed
 
 def create_3dcnn_lstm_attention_djamaco_model(input_shape, classes_count):
     input_layer = layers.Input(input_shape)
