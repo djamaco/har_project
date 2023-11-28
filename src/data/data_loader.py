@@ -33,15 +33,25 @@ def load_prepared_videos_list_and_mapper():
     return videos_list, new_cateogory_mapper
 
 def extract_preprocessed_frames(videofile_path):
+    # Initialize a list to hold the preprocessed frames
     frames_list = []
+    # Get a list of preprocessed frames from the given directory
     preprocessed_frames = os.listdir(videofile_path)
+
+    # Iterate over each frame in the directory
     for frame_name in preprocessed_frames:
+        # Read the image file to get the frame
         frame = cv2.imread(os.path.join(videofile_path, frame_name))
-        # Convert the frame to grayscale
+        # Check if only black and white frames are required; if so, convert to grayscale
         if BLACK_WHITE_ONLY: frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+        # Resize the frame to the desired dimensions (IMAGE_HEIGHT x IMAGE_WIDTH)
         frame = cv2.resize(frame, (IMAGE_HEIGHT, IMAGE_WIDTH))
-        frame = frame / 255 # Normalize the frame
+        # Normalize the frame by dividing by 255 to get pixel values in the range [0, 1]
+        frame = frame / 255 
+        # Append the processed frame to the list
         frames_list.append(frame)
+    
+    # Return the list of processed frames
     return frames_list
 
 def extract_frames_from_videos(videofile_path):
