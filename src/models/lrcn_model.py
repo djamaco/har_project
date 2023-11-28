@@ -52,27 +52,27 @@ def create_lrcn_djamaco_model(input_shape, classes_count):
 
     """
     model = Sequential()
-    FCN_MAGIC_NUMBER = 16
+    MAGIC_NUMBER = 16
     
     # TimeDistributed CNN layers
-    model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER, (3, 3),  padding='same'), input_shape=input_shape))
+    model.add(layers.TimeDistributed(layers.Conv2D(MAGIC_NUMBER, (3, 3),  padding='same'), input_shape=input_shape))
     model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
     model.add(layers.Dropout(0.25))
 
-    model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER * 2, (3, 3), padding='same', activation='relu')))
+    model.add(layers.TimeDistributed(layers.Conv2D(MAGIC_NUMBER * 2, (3, 3), padding='same', activation='relu')))
     model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
     model.add(layers.Dropout(0.25))
 
-    model.add(layers.TimeDistributed(layers.Conv2D(FCN_MAGIC_NUMBER * 4, (3, 3), padding='same', activation='relu')))
+    model.add(layers.TimeDistributed(layers.Conv2D(MAGIC_NUMBER * 4, (3, 3), padding='same', activation='relu')))
     model.add(layers.Activation('relu'))
     model.add(layers.TimeDistributed(layers.MaxPooling2D((2, 2))))
 
     model.add(layers.TimeDistributed(layers.Flatten()))
 
     # LSTM layer
-    model.add(layers.LSTM(FCN_MAGIC_NUMBER * 4, return_sequences=False))
+    model.add(layers.LSTM(MAGIC_NUMBER * 4, return_sequences=False))
 
     # Dense layer
     model.add(layers.Dense(classes_count, activation='softmax'))
