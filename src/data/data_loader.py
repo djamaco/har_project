@@ -25,7 +25,7 @@ def load_prepared_videos_list_and_mapper():
     #Normalize classes labels inside category_mapper and videos_list to be in range [0, len(category_mapper))
     for i, (key, value) in enumerate(category_mapper.items()):
         value['old_label'] = int(key)
-        new_cateogory_mapper[i] = value
+        new_cateogory_mapper[str(i)] = value
         for j, (video_name, label) in enumerate(videos_list):
             if label == int(key):
                 videos_list[j] = (video_name, i)

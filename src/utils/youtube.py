@@ -2,6 +2,7 @@ import os
 import sys
 from typing import Tuple
 from pytube import YouTube
+from src.utils.helper import sanitize_file_path
 
 def _progress_function(stream, chunk, bytes_remaining):
     total_size = stream.filesize
@@ -23,12 +24,12 @@ def download_youtube_video(youtube_video_url: str, output_directory: str, redown
         Tuple[str, str]: A tuple containing the title of the downloaded video and the file path of the downloaded video.
     """
     yt = YouTube(youtube_video_url, on_progress_callback=_progress_function)
-    title = yt.title
+    title = sanitize_file_path(yt.title)
     output_file_path = os.path.join(output_directory, f'{title}.mp4')
     if os.path.exists(output_file_path) and not redownload:
         print(f'Video already downloaded at {output_directory}')
-        return title, output_file_path
+        return title, output_file_path, yt.title
     video = yt.streams.filter(progressive=True, file_extension='mp4').order_by('resolution').desc().first()
-    video.download(output_directory)
-    return title, output_file_path
+    video.download(output_directory, filename=f'{title}.mp4')
+    return title, output_file_path, yt.title
 

@@ -7,6 +7,7 @@ import tensorflow as tf
 
 from src.config import FRAMES_COUNT, IMAGE_HEIGHT, IMAGE_WIDTH
 from src.data.data_loader import load_prepared_videos_list_and_mapper
+from src.utils.helper import sanitize_file_path
 
 Sequential = tf.keras.models.Sequential
 
@@ -24,7 +25,7 @@ def predict_on_video(model: Sequential, video_file_path: str, output_file_path: 
     """
  
     # Open the input video file
-    video_reader = cv2.VideoCapture(video_file_path)
+    video_reader = cv2.VideoCapture(sanitize_file_path(video_file_path))
  
     # Get the original video dimensions
     original_video_width = int(video_reader.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -85,7 +86,7 @@ def predict_single_action(model: Sequential, video_file_path: str) -> Tuple[str,
     Returns:
         A tuple containing the predicted action label and the probability of the prediction.
     """
-    video_reader = cv2.VideoCapture(video_file_path)
+    video_reader = cv2.VideoCapture(sanitize_file_path(video_file_path))
     frames_list = []
     predicted_class_name = ''
     video_frames_count = int(video_reader.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -101,6 +102,7 @@ def predict_single_action(model: Sequential, video_file_path: str) -> Tuple[str,
         frames_list.append(normalized_frame)
  
     predicted_labels_probabilities = model.predict(np.expand_dims(frames_list, axis = 0))[0]
+    print(predicted_labels_probabilities)
     predicted_label = np.argmax(predicted_labels_probabilities)
 
     _, classes = load_prepared_videos_list_and_mapper()
